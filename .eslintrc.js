@@ -15,5 +15,6 @@ module.exports = {
         indent: ['error', 4],
         'eol-last': 1,
         'linebreak-style': 0,
+        'func-names': 'never',
     },
 };
