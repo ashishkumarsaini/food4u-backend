@@ -50,6 +50,20 @@ exports.updateUser = (req, res) => {
     )
 };
 
+exports.deleteUser = (req, res) => {
+    User.findByIdAndDelete({ _id: req.profile?._id.toString()},(err, user)=>{
+        if(err){
+            res.status(400).json({
+                error: 'Unable to delete user',
+            })
+        }
+        return res.json({
+            message: 'User deleted!',
+            user: user,
+        })
+    });
+};
+
 exports.getPurchasedOrders = (req, res) => {
     if (!req.profile?._id) {
         return res.status(400).json({

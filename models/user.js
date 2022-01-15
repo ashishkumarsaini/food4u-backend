@@ -24,6 +24,12 @@ const userSchema = mongoose.Schema({
         type: String,
         trim: true,
     },
+    mobile: {
+        type: String,
+        trim: true,
+        required: true,
+        unique: true,
+    },
     salt: {
         type: String,
     },

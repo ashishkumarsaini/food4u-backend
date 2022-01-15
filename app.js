@@ -8,6 +8,7 @@ var cookieParser = require('cookie-parser')
 // routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const productRoutes = require('./routes/product');
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.get('/api/test', (req, res) => {
 });
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
+app.use('/api', productRoutes);
 
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}/`);

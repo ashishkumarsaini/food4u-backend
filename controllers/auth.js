@@ -3,21 +3,42 @@ const jwt = require('jsonwebtoken');
 const expressJWT = require('express-jwt');
 
 exports.signUp = (req, res) => {
-    const user = new User(req.body);
-    user.save((err, savedUser) => {
-        if (err) {
-            return res.status(400).json({
-                err: 'Failed to create user.',
+
+    User.findOne({
+        $or: [{
+            email: req.body.email,
+        }, {
+            mobile: req.body.mobile,
+        }]
+        },(err, user) => {
+            if(user?.email === req.body.email){
+                return res.status(400).json({
+                    error: 'Email already exist',
+                })
+            }
+            if(user?.mobile === req.body.mobile){
+                return res.status(400).json({
+                    error: 'Mobile already exist',
+                })
+            }
+            const newUser = new User(req.body);
+            newUser.save((err, savedUser) => {
+                if (err) {
+                    return res.status(400).json({
+                        err: 'Failed to create user.',
+                        message: err,
+                    });
+                }
+
+                savedUser.salt = undefined;
+                savedUser.encrypt_password = undefined;
+
+            return res.status(200).json({
+                user: savedUser,
             });
-        }
-
-        user.salt = undefined;
-        user.encrypt_password = undefined;
-
-        return res.json({
-            user: user,
-        });
+        })
     });
+
 };
 
 exports.signIn = (req, res) => {
@@ -36,7 +57,7 @@ exports.signIn = (req, res) => {
 
         if (!user.authenticate(password)){
             return res.status(400).json({
-                error: 'Email and password does not match'
+                error: 'Email and password does not match.'
             })
         }
 
@@ -71,16 +92,25 @@ exports.isAuthenticate = (req, res, next) => {
     const checkAuthenticate = req.profile && req.auth && req.profile._id?.toString() === req.auth._id || false;
     if(!checkAuthenticate){
         return res.status(400).json({
-            error: 'ACCESS DENIED',
+            error: 'ACCESS DENIED, You are not autheticated',
         });
     }
     next();
 };
 
-exports.isAdmin = (req, res) => {
-    if (req?.profile?.privilege !== 2){
+exports.isAdmin = (req, res, next) => {
+    if (req?.profile?.privilege < 1){
         return res.status(400).json({
             error: 'ACCESS DENIED, You are not an admin.'
+        });
+    }
+    next();
+};
+
+exports.isSuperAdmin = (req, res, next) => {
+    if (req?.profile?.privilege !== 2){
+        return res.status(400).json({
+            error: 'ACCESS DENIED, You are not a super admin.'
         });
     }
     next();
