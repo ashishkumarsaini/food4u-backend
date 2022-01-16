@@ -4,12 +4,12 @@ exports.getUserById = (req, res, next, id) => {
     User.findById(id).exec((err, user)=>{
         if(err){
             return res.status(400).json({
-                error: 'Something went wrong!',
+                error: 'Something went wrong! Unable to find user.',
             })
         }
         if(!user){
             return res.status(400).json({
-                error: 'Unable to find user',
+                error: 'User does not exists',
             })
         }
         user.salt = undefined;
@@ -22,7 +22,7 @@ exports.getUserById = (req, res, next, id) => {
 exports.getUser = (req, res) => {
     if(!req.profile?._id){
         return res.status(400).json({
-            error: 'Unable to find user',
+            error: 'User does not exists',
         })
     };
     return res.status(200).json({

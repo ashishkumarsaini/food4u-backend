@@ -4,7 +4,7 @@ exports.getProductById = (req, res, next, id) => {
     Product.findById(id).exec((err, product)=>{
         if(err){
             return res.status(400).json({
-                error: 'Something went wrong!',
+                error: 'Something went wrong! Unable to get product.',
             })
         }
         if(!product){
@@ -93,3 +93,28 @@ exports.deleteProduct = (req, res) => {
         }
     );
 };
+
+exports.getAllProducts = (req, res) => {
+    Product.find().sort({ name: 1 }).exec((err, products)=>{
+        if(err){
+            return res.status(200).json({
+                error: 'Unable to get products.'
+            })
+        }
+        if(!products.length){
+            return res.status(200).json({
+                message: 'No products found'
+            })
+        }
+        return res.status(200).json({
+            products: products,
+        })
+    })
+}
+
+// exports.updatedStock = (req, res) => {
+//     const {order} = req.body;
+
+//     const updatedProducts = order.products?.map((item)=>{
+//     })
+// }
