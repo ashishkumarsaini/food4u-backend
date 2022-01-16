@@ -45,7 +45,7 @@ const userSchema = mongoose.Schema({
 
 userSchema
     .virtual('password')
-    .set(function(password){
+    .set(function (password) {
         this._password = password;
         this.salt = uuidv4();
         this.encrypt_password = this.securePassword(password);
@@ -55,15 +55,15 @@ userSchema
     });
 
 userSchema.methods = {
-    authenticate: function(inputPassword){
+    authenticate: function (inputPassword) {
         return this.securePassword(inputPassword) === this.encrypt_password;
     },
-    securePassword: function(inputPassword){
-        if(!inputPassword) return '';
+    securePassword: function (inputPassword) {
+        if (!inputPassword) return '';
         try {
             return crypto.createHmac('sha256', this.salt).update(inputPassword).digest('hex');
         }
-        catch(err){
+        catch (err) {
             return '';
         }
     }
