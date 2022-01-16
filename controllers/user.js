@@ -31,6 +31,11 @@ exports.getUser = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
+    if (!req.profile?._id) {
+        return res.status(400).json({
+            error: 'User does not exists',
+        })
+    };
     User.findByIdAndUpdate(
         { _id: req.profile._id},
         { $set: req.body },
@@ -51,6 +56,11 @@ exports.updateUser = (req, res) => {
 };
 
 exports.deleteUser = (req, res) => {
+    if (!req.profile?._id) {
+        return res.status(400).json({
+            error: 'User does not exists',
+        })
+    };
     User.findByIdAndDelete({ _id: req.profile?._id.toString()},(err, user)=>{
         if(err){
             res.status(400).json({
