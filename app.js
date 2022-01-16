@@ -30,7 +30,7 @@ app.use(cors());
 app.get('/api/test', (req, res) => {
     res.status(200).json({
         success: true,
-    })
+    });
 });
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
