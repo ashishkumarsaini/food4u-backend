@@ -13,20 +13,25 @@ exports.signUp = (req, res) => {
         },(err, user) => {
             if(user?.email === req.body.email){
                 return res.status(400).json({
-                    error: 'Email already exist',
+                    message: 'Email already exist',
+                    status: 400,
+                    success: false,
                 })
             }
             if(user?.mobile === req.body.mobile){
                 return res.status(400).json({
-                    error: 'Mobile already exist',
+                    message: 'Mobile already exist',
+                    status: 400,
+                    success: false,
                 })
             }
             const newUser = new User(req.body);
             newUser.save((err, savedUser) => {
                 if (err) {
                     return res.status(400).json({
-                        err: 'Failed to create user.',
-                        message: err,
+                        message: 'Failed to create user.',
+                        status: 400,
+                        success: false,
                     });
                 }
 
@@ -34,7 +39,11 @@ exports.signUp = (req, res) => {
                 savedUser.encrypt_password = undefined;
 
             return res.status(200).json({
-                user: savedUser,
+                result: {
+                    user: savedUser,
+                },
+                status: 200,
+                success: true,
             });
         })
     });
@@ -46,18 +55,24 @@ exports.signIn = (req, res) => {
     User.findOne({ email }, (err, user) => {
         if(err){
             return res.status(400).json({
-                error: 'Unable to signin.',
+                message: 'Unable to signin.',
+                status: 400,
+                success: false,
             })
         }
         if(!user){
             return res.status(400).json({
-                error: 'User email does not exist.'
+                message: 'User email does not exist.',
+                status: 400,
+                success: false,
             })
         }
 
         if (!user.authenticate(password)){
             return res.status(400).json({
-                error: 'Email and password does not match.'
+                message: 'Email and password does not match.',
+                status: 400,
+                success: false,
             })
         }
 
@@ -69,7 +84,11 @@ exports.signIn = (req, res) => {
 
         return res.status(200).json({
             token,
-            user: user,
+            result: {
+                user: user,
+            },
+            status: 400,
+            success: false,
         })
     })
 };
@@ -77,7 +96,9 @@ exports.signIn = (req, res) => {
 exports.signOut = (req, res) => {
     res.clearCookie("token");
     res.json({
-        message: "User signout successfully"
+        message: "User signout successfully",
+        status: 200,
+        success: true,
     });
 };
 
@@ -91,8 +112,10 @@ exports.isSignedIn = expressJWT({
 exports.isAuthenticate = (req, res, next) => {
     const checkAuthenticate = req.profile && req.auth && req.profile._id?.toString() === req.auth._id || false;
     if(!checkAuthenticate){
-        return res.status(400).json({
-            error: 'ACCESS DENIED, You are not autheticated',
+        return res.status(403).json({
+            message: 'ACCESS DENIED, You are not autheticated',
+            status: 403,
+            success: false,
         });
     }
     next();
@@ -101,7 +124,9 @@ exports.isAuthenticate = (req, res, next) => {
 exports.isAdmin = (req, res, next) => {
     if (req?.profile?.privilege < 1){
         return res.status(400).json({
-            error: 'ACCESS DENIED, You are not an admin.'
+            message: 'ACCESS DENIED, You are not an admin.',
+            status: 400,
+            success: false,
         });
     }
     next();
@@ -110,7 +135,9 @@ exports.isAdmin = (req, res, next) => {
 exports.isSuperAdmin = (req, res, next) => {
     if (req?.profile?.privilege !== 2){
         return res.status(400).json({
-            error: 'ACCESS DENIED, You are not a super admin.'
+            message: 'ACCESS DENIED, You are not a super admin.',
+            status: 400,
+            success: false,
         });
     }
     next();
